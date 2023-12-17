@@ -1,8 +1,25 @@
 const rls = require('readline-sync');
+const MOVES =
+{ r  : "rock" ,
+  p  : "paper",
+  sc : "scissors",
+  l  : "lizard",
+  sp : "spock"
+};
+
+const WINNING_MOVES =
+{ rock     : ["scissors", "lizard"],
+  paper    : ["spock"   , "rock"  ],
+  scissors : ["paper"   , "lizard"],
+  lizard   : ["spock"   , "paper" ],
+  spock    : ["scissors", "rock"  ]
+};
+
 
 function createPlayer() {
   return {
     move: null,
+    score: 0,
   };
 }
 
@@ -26,7 +43,8 @@ function createHuman() {
   let humanObject = {
     choose() {
       let choice;
-
+      // refactor: allow user to input single letter
+      // (map single letter to full word choice)
       while (true) {
         console.log('Please choose rock, paper, or scissors:');
         choice = rls.question();
@@ -53,13 +71,10 @@ function createHuman() {
 //   };
 // }
 
-// let compare = (move1, move2) => {
-//   //
-// };
-
 const RPSGame = {
   human: createHuman('human'),
   computer: createComputer('computer'),
+  currentWinner: null,
 
   displayWelcome() {
     console.log("Welcome to Rock, Papers, Scissors!");
@@ -69,20 +84,27 @@ const RPSGame = {
     console.log('Thanks for playing Rock, Paper, Scissors. Goodbye!');
   },
 
-  displayWinner() {
+  compare() {
     let humanMove = this.human.move;
     let computerMove = this.computer.move;
 
+    if (WINNING_MOVES[humanMove].includes(computerMove)) {
+      this.currentWinner = 'human';
+    } else if (WINNING_MOVES[computerMove].includes(humanMove)) {
+      this.currentWinner = 'computer';
+    } else {
+      this.currentWinner = 'tie';
+    }
+  },
+
+  // refactor: based on new compare function
+  displayWinner() {
     console.log(`You chose: ${this.human.move}`);
     console.log(`The computer chose: ${this.computer.move}`);
 
-    if ((humanMove === 'rock' && computerMove === 'scissors') ||
-        (humanMove === 'paper' && computerMove === 'rock') ||
-        (humanMove === 'scissors' && computerMove === 'paper')) {
+    if (this.currentWinner === 'human') {
       console.log('You win!');
-    } else if ((humanMove === 'rock' && computerMove === 'paper') ||
-               (humanMove === 'paper' && computerMove === 'scissors') ||
-               (humanMove === 'scissors' && computerMove === 'rock')) {
+    } else if (this.currentWinner === 'computer') {
       console.log('Computer wins!');
     } else {
       console.log("It's a tie");
@@ -95,17 +117,26 @@ const RPSGame = {
     return answer.toLowerCase()[0] === 'y';
   },
 
-  play() {
-    this.displayWelcome();
+  playRound() {
+    // add keep score step
+    this.displayWelcome(); // move to playMatch method
+    // display rules
     while (true) {
       this.human.choose();
       this.computer.choose();
+      this.compare();
       this.displayWinner();
-      if (!this.playAgain()) break;
+      if (!this.playAgain()) break; // move to playMatch method
     }
 
-    this.displayGoodbye();
+    this.displayGoodbye(); // move to playMatch method
   },
+
+
+  // playMatch() {
+  //   const WINNING_SCORE = 5;
+
+  // }
 };
 
-RPSGame.play();
+RPSGame.playRound();
