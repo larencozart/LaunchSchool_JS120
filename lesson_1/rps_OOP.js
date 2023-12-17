@@ -82,7 +82,6 @@ const RPSGame = {
   human: createHuman('human'),
   computer: createComputer('computer'),
   roundWinner: null,
-  matchWinner: null,
 
   displayWelcome() {
     console.log("Welcome to Rock, Papers, Scissors, Lizard, Spock!");
