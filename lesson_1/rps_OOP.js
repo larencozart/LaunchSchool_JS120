@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 const rls = require('readline-sync');
 const MOVES =
 { r  : "rock" ,
@@ -66,12 +67,6 @@ function createHuman() {
   return Object.assign(playerObject, humanObject);
 }
 
-// function createMove() {
-//   return {
-//     // possible state: type of move
-//   };
-// }
-
 // function createRule() {
 //   return {
 //     //
@@ -82,6 +77,7 @@ const RPSGame = {
   human: createHuman('human'),
   computer: createComputer('computer'),
   roundWinner: null,
+  history: [],
 
   displayWelcome() {
     console.log("Welcome to Rock, Papers, Scissors, Lizard, Spock!");
@@ -123,7 +119,13 @@ const RPSGame = {
 
   playAgain() {
     console.log('Would you like to play again? (y/n)');
-    let answer = rls.question();
+    let answer;
+    while (true) {
+      answer = rls.question().toLowerCase();
+      if (['yes','no', 'y', 'n'].includes(answer)) break;
+      console.log('Please enter (y)es to play again or (n)o to exit: ');
+    }
+
     return answer.toLowerCase()[0] === 'y';
   },
 
@@ -156,18 +158,37 @@ const RPSGame = {
       `\nCURRENT SCORE:\n${'-'.repeat('CURRENT SCORE'.length)}\nYou: ${this.human.score}\nComputer: ${this.computer.score}\n`);
   },
 
+  updateHistory() {
+    let roundHistory = { humanMove: this.human.move,
+      computerMove: this.computer.move,
+      winner: this.roundWinner};
+
+    this.history.push(roundHistory);
+  },
+
+  clearPlayerScores() {
+    this.human.score = 0;
+    this.computer.score = 0;
+  },
+
+  // eslint-disable-next-line max-statements
   playMatch() {
+    // refactor: abstract away too many lines/statements to another
+    //           method or function (playGame?, play? runEngine?)
     const WINNING_SCORE = 5;
 
     while (true) {
       console.clear();
       this.displayWelcome();
       this.displayRules();
+      this.clearPlayerScores();
 
       while (true) {
         this.displayScore();
         this.playRound();
         this.updateMatchScore();
+        this.updateHistory();
+        // console.log('HISTORY:' + JSON.stringify(this.history));
 
         if (this.human.score === WINNING_SCORE ||
             this.computer.score === WINNING_SCORE) break;
