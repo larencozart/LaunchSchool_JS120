@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 const rls = require('readline-sync');
 const MOVES =
 { r  : "rock" ,
@@ -50,8 +49,7 @@ function createHuman() {
   let humanObject = {
     choose() {
       let choice;
-      // refactor: allow user to input single letter
-      // (map single letter to full word choice)
+
       while (true) {
         console.log('Please choose (r)ock, (p)aper, (sc)issors, (l)izard, or (sp)ock:');
         choice = rls.question().toLowerCase();
@@ -73,7 +71,7 @@ function createHuman() {
 //   };
 // }
 
-const RPSGame = {
+const RPS = {
   human: createHuman('human'),
   computer: createComputer('computer'),
   roundWinner: null,
@@ -85,10 +83,12 @@ const RPSGame = {
 
   displayRules() {
     console.log('\nThese are the rules:\n1) SCISSORS cuts paper and decapitates lizard.\n2) PAPER covers rock and disproves Spock.\n3) ROCK smashes scissors and crushes lizard\n4) LIZARD eats paper and poisons Spock\n5) SPOCK vaporizes rock and destroys scissors\nThe first player to win 5 rounds of Rock, Paper, Scissors will win the match! ');
+    console.log('\nPlease hit any key to begin: ');
+    rls.question();
   },
 
   displayGoodbye() {
-    console.log('Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!');
+    console.log('\nThanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!\n');
   },
 
   compare() {
@@ -171,16 +171,12 @@ const RPSGame = {
     this.computer.score = 0;
   },
 
-  // eslint-disable-next-line max-statements
+
   playMatch() {
-    // refactor: abstract away too many lines/statements to another
-    //           method or function (playGame?, play? runEngine?)
     const WINNING_SCORE = 5;
 
     while (true) {
       console.clear();
-      this.displayWelcome();
-      this.displayRules();
       this.clearPlayerScores();
 
       while (true) {
@@ -198,9 +194,15 @@ const RPSGame = {
       this.displayMatchWinner(WINNING_SCORE);
       if (!this.playAgain()) break;
     }
+  },
 
+  runGameEngine() {
+    console.clear();
+    this.displayWelcome();
+    this.displayRules();
+    this.playMatch();
     this.displayGoodbye();
   }
 };
 
-RPSGame.playMatch();
+RPS.runGameEngine();
