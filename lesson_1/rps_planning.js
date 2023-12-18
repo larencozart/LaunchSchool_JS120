@@ -22,6 +22,7 @@ nouns:
 - move
 - rule
 - round
+- history
 
 verbs:
 - choose
@@ -38,10 +39,6 @@ classes:
     - computerPlayer type
 
 
-*/
-
-/*
-
 KEEP SCORE FEATURE
 -------------------
 * add score as a property to each player's object
@@ -54,5 +51,28 @@ function createPlayer() {
     score: 0,
   };
 }
+
+KEEP HISTORY FEATURE
+---------------------
+- can be stored in RPSGame object as a state
+- creating a history that is neutral, but holds info that
+  computer can use to adjust moves
+
+data str: array holding objects
+[ {humanMove: 'rock', computerMove: 'scissors', winner: 'human' },
+  {humanMove: 'rock', computerMove: 'paper', winner: 'computer' },
+  { }, etc. ]
+
+
+- at end of each round, create object with properties: humanMove,
+  computerMove, and winner. append that object to history array
+
+
+ADJUST COMPUTER MOVE BASED ON HISTORY
+-------------------------------------
+1. select history objects from history array that have a winner property
+   value of 'human'
+2. perform analysis:
+
 
 */
