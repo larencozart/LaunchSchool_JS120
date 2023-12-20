@@ -1,11 +1,5 @@
 const rls = require('readline-sync');
-const MOVES =
-{ r  : "rock" ,
-  p  : "paper",
-  sc : "scissors",
-  l  : "lizard",
-  sp : "spock"
-};
+
 const WINNING_MOVES =
 { rock     : ["scissors", "lizard"],
   paper    : ["spock"   , "rock"  ],
@@ -31,8 +25,8 @@ function createComputer() {
     chooseMove(history) {
       if (history.length === 0) {
         const randomIndex = Math.floor(Math.random() *
-                            Object.values(MOVES).length);
-        this.move = Object.values(MOVES)[randomIndex];
+                            Object.keys(WINNING_MOVES).length);
+        this.move = Object.keys(WINNING_MOVES)[randomIndex];
       } else {
         const lastRoundHistory = history[history.length - 1];
         const lastHumanMove = lastRoundHistory.humanMove;
@@ -57,9 +51,17 @@ function createHuman() {
   let playerObject = createPlayer();
 
   let humanObject = {
+    moveAbreviations :
+    { r  : "rock" ,
+      p  : "paper",
+      sc : "scissors",
+      l  : "lizard",
+      sp : "spock"
+    },
+
     mapChoice(choice) {
-      if (Object.keys(MOVES).includes(choice)) {
-        return MOVES[choice];
+      if (Object.keys(this.moveAbreviations).includes(choice)) {
+        return this.moveAbreviations[choice];
       } else {
         return choice;
       }
@@ -71,8 +73,8 @@ function createHuman() {
       while (true) {
         console.log('Please choose (r)ock, (p)aper, (sc)issors, (l)izard, or (sp)ock:');
         choice = rls.question().toLowerCase();
-        if (Object.keys(MOVES).includes(choice) ||
-            Object.values(MOVES).includes(choice)) break;
+        if (Object.keys(this.moveAbreviations).includes(choice) ||
+            Object.values(this.moveAbreviations).includes(choice)) break;
         console.log('Sorry, invalid choice.');
       }
 
@@ -95,7 +97,7 @@ const RPS = {
 
   displayRules() {
     console.log('\nThese are the rules:\n1) SCISSORS cuts paper and decapitates lizard.\n2) PAPER covers rock and disproves Spock.\n3) ROCK smashes scissors and crushes lizard\n4) LIZARD eats paper and poisons Spock\n5) SPOCK vaporizes rock and destroys scissors\nThe first player to win 5 rounds of Rock, Paper, Scissors will win the match! ');
-    console.log('\nPlease hit any key to begin: ');
+    console.log('\nPlease hit enter to begin: ');
     rls.question();
   },
 
@@ -195,7 +197,6 @@ const RPS = {
         this.playRound();
         this.updateMatchScore();
         this.updateHistory();
-        // console.log('HISTORY:' + JSON.stringify(this.history));
 
         if (this.human.score === WINNING_SCORE ||
             this.computer.score === WINNING_SCORE) break;
