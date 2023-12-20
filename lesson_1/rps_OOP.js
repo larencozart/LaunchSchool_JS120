@@ -21,8 +21,6 @@ function createPlayer() {
   };
 }
 
-// potentially abstract out history analysis logic to another function,
-// but put it where? similar issue to map.. maybe in createPlayer ?
 // eslint-disable-next-line max-lines-per-function
 function createComputer() {
   let playerObject = createPlayer();
@@ -30,13 +28,12 @@ function createComputer() {
   let computerObject = {
     weightedChoices : [],
 
-    choose(history) {
+    chooseMove(history) {
       if (history.length === 0) {
         const randomIndex = Math.floor(Math.random() *
                             Object.values(MOVES).length);
         this.move = Object.values(MOVES)[randomIndex];
       } else {
-        // if there is history, use history analysis to determine move
         const lastRoundHistory = history[history.length - 1];
         const lastHumanMove = lastRoundHistory.humanMove;
         const beatsLastHumanMove = Object.keys(WINNING_MOVES).filter(move => {
@@ -68,7 +65,7 @@ function createHuman() {
       }
     },
 
-    choose() {
+    chooseMove() {
       let choice;
 
       while (true) {
@@ -106,7 +103,7 @@ const RPS = {
     console.log('\nThanks for playing Rock, Paper, Scissors, Lizard, Spock. Goodbye!\n');
   },
 
-  compare() {
+  determineWinner() {
     let humanMove = this.human.move;
     let computerMove = this.computer.move;
 
@@ -145,9 +142,9 @@ const RPS = {
   },
 
   playRound() {
-    this.human.choose();
-    this.computer.choose(this.history);
-    this.compare();
+    this.human.chooseMove();
+    this.computer.chooseMove(this.history);
+    this.determineWinner();
     console.clear();
     this.displayRoundWinner();
   },
