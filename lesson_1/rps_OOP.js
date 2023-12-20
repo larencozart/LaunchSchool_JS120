@@ -55,19 +55,19 @@ function createComputer() {
   return Object.assign(playerObject, computerObject);
 }
 
-// should I move mapChoice function to a method within createHuman ?
-function mapChoice(choice) {
-  if (Object.keys(MOVES).includes(choice)) {
-    return MOVES[choice];
-  } else {
-    return choice;
-  }
-}
-
+// eslint-disable-next-line max-lines-per-function
 function createHuman() {
   let playerObject = createPlayer();
 
   let humanObject = {
+    mapChoice(choice) {
+      if (Object.keys(MOVES).includes(choice)) {
+        return MOVES[choice];
+      } else {
+        return choice;
+      }
+    },
+
     choose() {
       let choice;
 
@@ -79,7 +79,7 @@ function createHuman() {
         console.log('Sorry, invalid choice.');
       }
 
-      this.move = mapChoice(choice);
+      this.move = this.mapChoice(choice);
     },
   };
 
