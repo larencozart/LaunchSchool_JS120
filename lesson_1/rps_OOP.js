@@ -6,7 +6,6 @@ const MOVES =
   l  : "lizard",
   sp : "spock"
 };
-
 const WINNING_MOVES =
 { rock     : ["scissors", "lizard"],
   paper    : ["spock"   , "rock"  ],
@@ -22,19 +21,41 @@ function createPlayer() {
   };
 }
 
+// potentially abstract out history analysis logic to another function,
+// but put it where? similar issue to map.. maybe in createPlayer ?
+// eslint-disable-next-line max-lines-per-function
 function createComputer() {
   let playerObject = createPlayer();
 
   let computerObject = {
-    choose() {
-      let randomIndex = Math.floor(Math.random() * Object.values(MOVES).length);
-      this.move = Object.values(MOVES)[randomIndex];
+    weightedChoices : [],
+
+    choose(history) {
+      if (history.length === 0) {
+        const randomIndex = Math.floor(Math.random() *
+                            Object.values(MOVES).length);
+        this.move = Object.values(MOVES)[randomIndex];
+      } else {
+        // if there is history, use history analysis to determine move
+        const lastRoundHistory = history[history.length - 1];
+        const lastHumanMove = lastRoundHistory.humanMove;
+        const beatsLastHumanMove = Object.keys(WINNING_MOVES).filter(move => {
+          return WINNING_MOVES[move].includes(lastHumanMove);
+        });
+
+        this.weightedChoices = this.weightedChoices.concat(beatsLastHumanMove);
+
+        const randomIndex = Math.floor(Math.random() *
+                            this.weightedChoices.length);
+        this.move = this.weightedChoices[randomIndex];
+      }
     },
   };
 
   return Object.assign(playerObject, computerObject);
 }
 
+// should I move mapChoice function to a method within createHuman ?
 function mapChoice(choice) {
   if (Object.keys(MOVES).includes(choice)) {
     return MOVES[choice];
@@ -64,12 +85,6 @@ function createHuman() {
 
   return Object.assign(playerObject, humanObject);
 }
-
-// function createRule() {
-//   return {
-//     //
-//   };
-// }
 
 const RPS = {
   human: createHuman('human'),
@@ -131,7 +146,7 @@ const RPS = {
 
   playRound() {
     this.human.choose();
-    this.computer.choose();
+    this.computer.choose(this.history);
     this.compare();
     console.clear();
     this.displayRoundWinner();
@@ -170,7 +185,6 @@ const RPS = {
     this.human.score = 0;
     this.computer.score = 0;
   },
-
 
   playMatch() {
     const WINNING_SCORE = 5;
