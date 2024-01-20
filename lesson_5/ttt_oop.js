@@ -32,6 +32,8 @@ class Board {
     this.reset();
   }
 
+  // static MIDDLE_BOARD_SQUARE = this.squares['5'];
+
   display() {
     console.log("");
     console.log("     |     |");
@@ -124,6 +126,7 @@ class TTTGame {
       if (!this.playAgain()) break;
 
       this.board.reset();
+      console.clear();
     }
 
     this.displayGoodbyeMessage();
@@ -201,21 +204,32 @@ class TTTGame {
   }
 
   computerMoves() {
-    let validChoices = this.board.unusedSquares();
+    const validChoices = this.board.unusedSquares();
     let choice;
 
-    do {
-      choice = Math.floor((9 * Math.random()) + 1).toString();
-    } while (!validChoices.includes(choice));
+    const randomIndex = Math.floor((Math.random()) * validChoices.length);
+    choice = validChoices[randomIndex];
 
     this.board.markSquareAt(choice, this.computer.getMarker());
 
-    // let validMoves = this.board.unusedSquares();
-    // console.log(validMoves);
-    // let choice = Math.floor((Math.random() * validMoves.length));
-    // this.board.markSquareAt(choice, this.computer.getMarker());
-    // I did this different than ls to avoid magic number and for simplicity
-    // if there is an issue with computer moves, check here**
+    // from non-OOP tictactoe
+    // let square;
+    // const defensiveMove = playDefense(board);
+    // const offensiveMove = playOffense(board);
+
+    // if (offensiveMove) {
+    //   square = offensiveMove;
+    // } else if (defensiveMove) {
+    //   square = defensiveMove;
+    // } else if (emptySquares(board).includes(MIDDLE_BOARD_SQUARE)) {
+    //   square = MIDDLE_BOARD_SQUARE;
+    // } else {
+    //   let randomIndex = Math.floor(Math.random() *
+    //                     emptySquares(board).length);
+    //   square = emptySquares(board)[randomIndex];
+    // }
+
+    // board[square] = COMPUTER_MARKER;
   }
 
   gameOver() {
