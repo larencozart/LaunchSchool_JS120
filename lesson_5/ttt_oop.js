@@ -32,7 +32,7 @@ class Board {
     this.reset();
   }
 
-  // static MIDDLE_BOARD_SQUARE = this.squares['5'];
+  static MIDDLE_BOARD_SQUARE = '5';
 
   display() {
     console.log("");
@@ -204,11 +204,22 @@ class TTTGame {
   }
 
   computerMoves() {
-    const validChoices = this.board.unusedSquares();
     let choice;
+    const offensiveMove = null; // add playOffense()
+    const defensiveMove = null; // add playDefense()
+    const validChoices = this.board.unusedSquares();
 
-    const randomIndex = Math.floor((Math.random()) * validChoices.length);
-    choice = validChoices[randomIndex];
+    // SPIKE FOR COMPUTER AI
+    if (offensiveMove) {
+      choice = offensiveMove;
+    } else if (defensiveMove) {
+      choice = defensiveMove;
+    } else if (validChoices.includes(Board.MIDDLE_BOARD_SQUARE)) {
+      choice = Board.MIDDLE_BOARD_SQUARE; // choice should be '5'
+    } else {
+      const randomIndex = Math.floor((Math.random()) * validChoices.length);
+      choice = validChoices[randomIndex];
+    }
 
     this.board.markSquareAt(choice, this.computer.getMarker());
 
@@ -233,12 +244,12 @@ class TTTGame {
   }
 
   gameOver() {
-    return this.board.isFull() || this.isGameWon(); // LS names boardIsFull, someoneWon
+    return this.board.isFull() || this.isGameWon();
   }
 
   isWinner(player) {
     return TTTGame.winningCombos.some(combo => {
-      return this.board.countMarkers(player, combo) === 3;
+      return this.board.countMarkers(player, combo) === 3; // magic number fix
     });
   }
 
