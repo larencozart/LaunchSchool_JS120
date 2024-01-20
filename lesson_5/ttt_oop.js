@@ -1,4 +1,4 @@
-const readline = require("readline-sync"); // first line in ttt.js
+const readline = require("readline-sync");
 
 class Square {
   static INITIAL_MARKER = " ";
@@ -87,12 +87,6 @@ class Player {
   getMarker() {
     return this.marker;
   }
-
-  mark() {
-    //STUB
-    // We need a way to mark the board with this player's marker.
-    // How do we access the board?
-  }
 }
 
 class Human extends Player {
@@ -114,6 +108,8 @@ class TTTGame {
     this.computer = new Computer();
   }
 
+  static THREE_IN_A_ROW = 3;
+  static TWO_IN_A_ROW = 2;
   static winningCombos = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
     [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
 
@@ -203,44 +199,48 @@ class TTTGame {
     this.board.markSquareAt(choice, this.human.getMarker());
   }
 
+  findAtRiskSquare(player) {
+    let atRiskSquare = null;
+    const unusedSquares = this.board.unusedSquares();
+    const atRiskRow = TTTGame.winningCombos.find(combo => {
+      return this.board.countMarkers(player, combo) === TTTGame.TWO_IN_A_ROW;
+    });
+
+    if (atRiskRow) {
+      atRiskSquare = atRiskRow.find(square => {
+        return unusedSquares.includes(String(square));
+      });
+    }
+
+    return atRiskSquare;
+  }
+
+  computerOffense() {
+    return this.findAtRiskSquare(this.computer);
+  }
+
+  computerDefense() {
+    return this.findAtRiskSquare(this.human);
+  }
+
   computerMoves() {
     let choice;
-    const offensiveMove = null; // add playOffense()
-    const defensiveMove = null; // add playDefense()
+    const offensiveMove = this.computerOffense();
+    const defensiveMove = this.computerDefense();
     const validChoices = this.board.unusedSquares();
 
-    // SPIKE FOR COMPUTER AI
     if (offensiveMove) {
       choice = offensiveMove;
     } else if (defensiveMove) {
       choice = defensiveMove;
     } else if (validChoices.includes(Board.MIDDLE_BOARD_SQUARE)) {
-      choice = Board.MIDDLE_BOARD_SQUARE; // choice should be '5'
+      choice = Board.MIDDLE_BOARD_SQUARE;
     } else {
       const randomIndex = Math.floor((Math.random()) * validChoices.length);
       choice = validChoices[randomIndex];
     }
 
     this.board.markSquareAt(choice, this.computer.getMarker());
-
-    // from non-OOP tictactoe
-    // let square;
-    // const defensiveMove = playDefense(board);
-    // const offensiveMove = playOffense(board);
-
-    // if (offensiveMove) {
-    //   square = offensiveMove;
-    // } else if (defensiveMove) {
-    //   square = defensiveMove;
-    // } else if (emptySquares(board).includes(MIDDLE_BOARD_SQUARE)) {
-    //   square = MIDDLE_BOARD_SQUARE;
-    // } else {
-    //   let randomIndex = Math.floor(Math.random() *
-    //                     emptySquares(board).length);
-    //   square = emptySquares(board)[randomIndex];
-    // }
-
-    // board[square] = COMPUTER_MARKER;
   }
 
   gameOver() {
@@ -249,7 +249,7 @@ class TTTGame {
 
   isWinner(player) {
     return TTTGame.winningCombos.some(combo => {
-      return this.board.countMarkers(player, combo) === 3; // magic number fix
+      return this.board.countMarkers(player, combo) === TTTGame.THREE_IN_A_ROW;
     });
   }
 
