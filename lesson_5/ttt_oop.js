@@ -142,12 +142,31 @@ class TTTGame {
     console.log('Thanks for playing Tic-Tac-Toe! Goodbye!');
   }
 
+  joinOr(array, separator = ', ', conjunction = 'or') {
+    if (array.length <= 1) return array.toString();
+    if (array.length === 2) return `${array[0]} ${conjunction} ${array[1]}`;
+
+    let result = '';
+    array.forEach((el, idx, arr) => {
+      if (idx === arr.length - 1) {
+        result = result.concat(el);
+      } else if (idx === arr.length - 2) {
+        result = result.concat(`${el}${separator}${conjunction} `);
+      } else {
+        result = result.concat(`${el}${separator}`);
+      }
+    });
+
+    return result;
+  }
+
   humanMoves() {
     let choice;
 
     while (true) {
       let validMoves = this.board.unusedSquares();
-      choice = readline.question(`Choose a square (${validMoves.join(', ')}): `);
+      choice = readline.question(`Choose a square (${this.joinOr(validMoves)}): `);
+      // this.joinOr()
 
       if (validMoves.includes(choice)) break;
 
