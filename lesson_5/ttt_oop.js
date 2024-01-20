@@ -29,10 +29,7 @@ class Square {
 
 class Board {
   constructor() {
-    this.squares = {};
-    for (let square = 1; square <= 9; square += 1) {
-      this.squares[square] = new Square();
-    }
+    this.reset();
   }
 
   display() {
@@ -70,6 +67,13 @@ class Board {
     });
 
     return markers.length;
+  }
+
+  reset() {
+    this.squares = {};
+    for (let square = 1; square <= 9; square += 1) {
+      this.squares[square] = new Square();
+    }
   }
 }
 
@@ -111,10 +115,21 @@ class TTTGame {
   static winningCombos = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
     [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]];
 
-  play() {
-    //SPIKE
+  runGameEngine() {
     this.displayWelcomeMessage();
 
+    while (true) {
+      this.play();
+
+      if (!this.playAgain()) break;
+
+      this.board.reset();
+    }
+
+    this.displayGoodbyeMessage();
+  }
+
+  play() {
     while (true) {
       this.board.display();
 
@@ -130,7 +145,17 @@ class TTTGame {
     console.clear();
     this.board.display();
     this.displayResults();
-    this.displayGoodbyeMessage();
+  }
+
+  playAgain() {
+    let response;
+    while (true) {
+      response = readline.question('Would you like to play again? (y/n): ').toLowerCase();
+      if (['y', 'n'].includes(response)) break;
+      console.log('Please enter "y" to play again, or "n" to exit.');
+    }
+
+    return response === 'y';
   }
 
   displayWelcomeMessage() {
@@ -166,7 +191,6 @@ class TTTGame {
     while (true) {
       let validMoves = this.board.unusedSquares();
       choice = readline.question(`Choose a square (${this.joinOr(validMoves)}): `);
-      // this.joinOr()
 
       if (validMoves.includes(choice)) break;
 
@@ -220,4 +244,4 @@ class TTTGame {
 }
 
 let game = new TTTGame();
-game.play();
+game.runGameEngine();
