@@ -263,7 +263,7 @@ class TTTGame {
     console.clear();
     this.board.display();
     this.findRoundWinner();
-    if (this.gameStyle !== "match") {
+    if (this.gameStyle === "single") {
       this.displayRoundResults();
     }
 
