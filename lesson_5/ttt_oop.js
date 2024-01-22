@@ -111,7 +111,9 @@ class TTTGame {
     this.board = new Board();
     this.human = new Human();
     this.computer = new Computer();
+    this.gameStyle = null;
     this.roundWinner = null;
+    this.firstPlayer = this.human;
   }
 
   static THREE_IN_A_ROW = 3;
@@ -225,31 +227,47 @@ class TTTGame {
       `\nCURRENT SCORE:\n${'-'.repeat('CURRENT SCORE'.length)}\nYou: ${this.human.score}\nComputer: ${this.computer.score}\n`);
   }
 
-  playRound(gameStyle = "match") {
-    this.board.reset();
+  playerMoves(player) {
+    if (player === this.human) {
+      this.humanMoves();
+    } else {
+      this.computerMoves();
+    }
+  }
+
+  switchFirstPlayer (player) {
+    return player === this.human ? this.computer : this.human;
+  }
+
+  runGameLoop() {
+    let currentPlayer = this.firstPlayer;
 
     while (true) {
-      if (gameStyle === "match") {
+      if (this.gameStyle === "match") {
         this.displayScore();
       }
 
       this.board.display();
-
-      this.humanMoves();
-      if (this.gameOver()) break;
-
-      this.computerMoves();
+      this.playerMoves(currentPlayer);
       if (this.gameOver()) break;
 
       console.clear();
+      currentPlayer = this.switchFirstPlayer(currentPlayer);
     }
+  }
+
+  playRound() {
+    this.board.reset();
+    this.runGameLoop();
 
     console.clear();
     this.board.display();
     this.findRoundWinner();
-    if (gameStyle !== "match") {
+    if (this.gameStyle !== "match") {
       this.displayRoundResults();
     }
+
+    this.firstPlayer = this.switchFirstPlayer(this.firstPlayer);
   }
 
   updateMatchScore() {
@@ -292,6 +310,8 @@ class TTTGame {
 
       if (this.human.score === WINNING_SCORE ||
           this.computer.score === WINNING_SCORE) break;
+
+      // this.firstPlayer = this.switchFirstPlayer(this.firstPlayer);
     }
 
     console.clear();
@@ -300,7 +320,7 @@ class TTTGame {
     this.displayMatchResults(WINNING_SCORE);
   }
 
-  getGameStyle() {
+  setGameStyle() {
     let gameStyle;
     while (true) {
       gameStyle = readline
@@ -310,7 +330,11 @@ class TTTGame {
       console.log('Please enter "s" for a single tic-tac-toe game, or "m" for a match game.');
     }
 
-    return gameStyle === 'm' ? "match" : "single";
+    if (gameStyle === 'm') {
+      this.gameStyle = "match";
+    } else {
+      this.gameStyle = "single";
+    }
   }
 
   playAgain() {
@@ -333,12 +357,10 @@ class TTTGame {
     console.log('\nThanks for playing Tic-Tac-Toe! Goodbye!');
   }
 
-  displayRules(gameStyle) {
-    if (gameStyle === "match") {
-      console.log('\nMatch Game Rules: First player to win 3 rounds of Tic Tac Toe wins the match!');
-    } else {
-      console.log('\nSingle Game Rules: First player to get 3 marks in a row wins the game!');
-    }
+  displayRules() {
+    console.log(`\n=== RULES ===`);
+    console.log('\nSINGLE GAME: First player to get 3 marks in a row wins the game!');
+    console.log('\nMATCH GAME: First player to win 3 rounds of Tic Tac Toe wins the match!');
 
     console.log('\nPlease hit enter to begin: ');
     readline.question();
@@ -346,17 +368,17 @@ class TTTGame {
 
   runGameEngine() {
     this.displayWelcomeMessage();
+    this.displayRules();
 
     while (true) {
-      let gameStyle = this.getGameStyle();
-      if (gameStyle === "match") {
-        this.displayRules(gameStyle);
+      this.setGameStyle();
+
+      if (this.gameStyle === "match") {
         console.clear();
         this.playMatch();
       } else {
-        this.displayRules(gameStyle);
         console.clear();
-        this.playRound(gameStyle);
+        this.playRound();
       }
 
       if (!this.playAgain()) break;
